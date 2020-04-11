@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block extra_head %}
+    <style>
+        .center-div
+        {
+             margin: 0 auto;
+             width: 200px;
+        }
+    </style>
+{% endblock %}
+{% block top_bar %}
+    <a href="{% url 'home' %}"><i class="material-icons">home</i></a>
+{% endblock %}
+{% block content %}
+    <div style="text-align: center;">
+        <h1>Register for The Paper</h1>
+    </div>
+    <form method="POST" id="login-form" class="center-div">
+        <div style="color:red;">
+            <span>{{ error }}</span>
+        </div>
+        {% csrf_token %}
+        <label for="username">
+            Username
+        </label>
+        <input name="username" type="text" />
+        <br />
+        <label for="password">
+            Password
+        </label>
+        <input name="password" type="password" />
+        <br />
+        <label for="password_2">
+            Confirm Password
+        </label>
+        <input name="password_2" type="password" />
+        <br />
+        <button>Submit</button>
+        <br />
+        <a href="{% url "login-user" %}">Already have an account? Login here.</a>
+    </form>
+{% endblock %}

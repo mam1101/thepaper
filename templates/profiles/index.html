@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block extra_head %}
+    <style>
+        .main-page {
+            padding-top:1em;
+            padding-bottom:1em;
+        }
+    </style>
+{% endblock %}
+{% block top_bar %}
+    <a href="{% url 'home' %}"><i class="material-icons">home</i></a>
+    <a href="{% url "profile-index" %}" style="float:right;"><i class="material-icons">account_circle</i></a>
+{% endblock %}
+{% block content %}
+    <div class="main-page">
+        <div style="text-align: center;">
+            USER: {{ user.username }}
+        </div>
+        <br />
+        {% if not papers %}
+            <div style="text-align: center;">
+                No Papers Yet
+            </div>
+        {% endif %}
+        <ul style="list-style:none;">
+        {% for item in papers %}
+            <li>
+                <a href="/paper/{{ item.slug }}/"><b>@{{ item.slug }}</b></a> | <a href="{% url "profile-mentions" %}?paper={{ item.slug }}">View Mentions</a>
+                <br />
+                {{ item.created }}
+                <br />
+                {% if item.published %}
+                    <span style="color:green">Published</span>
+                {% else %}
+                    <span style="color:red">Saved</span>
+                {% endif %}
+                <hr />
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}

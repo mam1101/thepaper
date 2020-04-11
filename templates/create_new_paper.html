@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_head %}
+    <script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=4tbdnmionyarni61oc2chiuisdp3vi0xrds83zjr62zztw3w"></script>
+    <script src="{% static "js/tinymce/jquery.tinymce.min.js" %}"></script>
+    <script>tinymce.init({ selector:'textarea', menubar:false, height : "90vh"});</script>
+    <style>
+        body {
+            margin-bottom:80px;
+        }
+    </style>
+{% endblock %}
+{% block top_bar %}
+    <a href="{% url 'home' %}"><i class="material-icons">home</i></a>
+    <a href="/account/" style="float:right;"><i class="material-icons">account_circle</i></a>
+{% endblock %}
+{% block content %}
+    <form method="POST" action="{% url 'submit-paper' %}" id="create_paper">
+        {% csrf_token %}
+        <textarea id="id_body" name="body">{{ respond }}</textarea>
+        <input id="id_published" name="published" type="checkbox" style="display: none;"/>
+        <input id="id_owner" name="owner" type="text" style="display: none;" value="{{ user.id }}"/>
+    </form>
+    <div class="bottom-bar">
+        <button id='submit_btn' class="material-button-raised" style="background-color:green;">Submit</button>
+{#        <button id='save_btn' class="material-button-raised">Save</button>#}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+        $('#submit_btn').on('click', function (e) {
+            $( "#id_published" ).prop( "checked", true );
+            $('#create_paper').submit();
+        });
+
+        $('#save_btn').on('click', function (e) {
+            $( "#id_published" ).prop( "checked", false );
+            $('#create_paper').submit();
+        });
+        window.onbeforeunload = function (e) {
+            var e = e || window.event;
+            var msg = 'Are you sure you want to leave?';
+
+            // For IE and Firefox
+            if (e) {
+                e.returnValue = msg;
+            }
+
+            // For Safari / chrome
+            return msg;
+        }
+    </script>
+{% endblock %}

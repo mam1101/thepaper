@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body_override %}
+<body>
+	<div class="arrow-right">
+		<a href="#"><i class="material-icons" style="color:#d0d0d0;font-size:50px;">
+			arrow_forward_ios
+		</i></a>
+	</div>
+	<div class="arrow-left">
+		<a href="#"><i class="material-icons" style="color:#d0d0d0;font-size:50px;">
+			arrow_back_ios
+		</i></a>
+	</div>
+	<div class="page">
+		<div class="top-bar">
+			<a href="{% url 'create-new-paper' %}"><i class="material-icons">add</i></a>
+			<a href="#" id="reply"><i class="material-icons">reply</i></a>
+            <a id='mentions' href="{% url 'profile-mentions' %}?paper="><i class="material-icons">alternate_email</i></a>
+            <a id='random' href="{% url 'random-paper' %}"><i class="material-icons">loop</i></a>
+            <a id='paper_slug' style="vertical-align: center;top:10px;position:absolute;" href="{% url 'random-paper' %}"></a>
+
+			<a href="{% url "profile-index" %}" style="float:right;"><i class="material-icons">account_circle</i></a>
+{#			<a href="#"><i class="material-icons">share</i></a>#}
+		</div>
+		<div style="min-height: 90vh;">
+            <div id="body" style="padding-left: 5%;padding-right: 5%;padding-top:2%;padding-bottom:2%;">
+
+            </div>
+
+        </div>
+	</div>
+</body>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+    let currentDate = new Date();
+    let dateString = currentDate.toISOString();
+
+    String.prototype.regexIndexOf = function(regex, startpos) {
+        var indexOf = this.substring(startpos || 0).search(regex);
+        return (indexOf >= 0) ? (indexOf + (startpos || 0)) : indexOf;
+    }
+    function getReferences(){
+        var text = $('#body').text();
+        for(var i=0; i<text.length;i++) {
+            if (text[i] === "@"){
+                var textSection = text.substring(i, text.length);
+                var checkString = textSection.substring(0, textSection.regexIndexOf('[\\n, ]'));
+                var total = 0;
+                for (var p = 0; p<checkString.length; p++) {
+                    if (checkString[p] === '-'){
+                        total += 1
+                    }
+                }
+                if (total == 2) {
+                    console.log(checkString);
+                    var html = $('#body').html();
+                    var start = html.search(checkString);
+                    var end = start + checkString.length;
+                    $('#body').html(html.substring(0, start) + '<a href="/paper/' + checkString.substring(1, checkString.length) + '/">' + checkString + '</a>' + html.substring(end, html.length));
+                }
+            }
+        }
+    }
+
+    var currentPage = 0;
+
+	$('.arrow-left').on('click', function(e) {
+		$('.page').addClass('hidden');
+		if (currentPage <= 0) {
+		    currentPage = 0;
+        }else {
+		    currentPage -= 1;
+        }
+		$.get( "{% url "frontpage-page-paper" %}?date=" + dateString + "&page=" + currentPage, function( data ) {
+
+		    let response = data['Success'];
+            let slug = response['fields']['slug'];
+            $('#reply').attr('href', '/new/?respond=' + slug);
+            $('#paper_slug').attr('href', '/paper/' + slug);
+            $('#mentions').attr('href', '{% url 'profile-mentions' %}?paper=' + slug);
+            $('#body').html(response['fields']['body']);
+            $('#paper_slug').html('@' + slug);
+            window.location.hash = slug;
+            $('.page').removeClass('hidden');
+			$('.page').addClass('visible');
+			getReferences();
+        });
+	});
+	$('.arrow-right').on('click', function(e) {
+		$('.page').addClass('hidden');
+		currentPage += 1;
+		$.get( "{% url "frontpage-page-paper" %}?date=" + dateString + "&page=" + currentPage, function( data ) {
+		    let response = data['Success'];
+            let slug = response['fields']['slug'];
+            $('#reply').attr('href', '/new/?respond=' + slug);
+            $('#paper_slug').attr('href', '/paper/' + slug);
+            $('#mentions').attr('href', '{% url 'profile-mentions' %}?paper=' + slug);
+            $('#body').html(response['fields']['body']);
+            $('#paper_slug').html('@' + slug);
+            window.location.hash = slug;
+            $('.page').removeClass('hidden');
+			$('.page').addClass('visible');
+			getReferences();
+        });
+	});
+	$('.page').addClass('hidden');
+    $.get( "{% url "frontpage-paper" %}?date=" + dateString, function( data ) {
+        let response = data['Success'];
+        let slug = response['fields']['slug'];
+        $('#reply').attr('href', '/new/?respond=' + slug);
+        $('#paper_slug').attr('href', '/paper/' + slug);
+        $('#mentions').attr('href', '{% url 'profile-mentions' %}?paper=' + slug);
+        $('#body').html(response['fields']['body']);
+        $('#paper_slug').html('@' + slug);
+        window.location.hash = slug;
+        $('.page').removeClass('hidden');
+        $('.page').addClass('visible');
+        getReferences();
+    });
+</script>
+{% endblock %}

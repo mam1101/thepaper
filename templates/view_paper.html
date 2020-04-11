@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_head %}
+{% endblock %}
+{% block top_bar %}
+    <a href="{% url 'home' %}"><i class="material-icons">home</i></a>
+    <a href="{% url 'create-new-paper' %}"><i class="material-icons">add</i></a>
+    <a href="{% url 'create-new-paper' %}?respond={{ paper.slug }}"><i class="material-icons">reply</i></a>
+    <a href="{% url 'profile-mentions' %}?paper={{ paper.slug }}"><i class="material-icons">alternate_email</i></a>
+    <a id='random' href="{% url 'random-paper' %}"><i class="material-icons">loop</i></a>
+    <a href="{% url "profile-index" %}" style="float:right;"><i class="material-icons">account_circle</i></a>
+{#    <a href="#"><i class="material-icons">share</i></a>#}
+{#    <a href="#"><i class="material-icons">bookmark</i></a>#}
+{% endblock %}
+{% block content %}
+    <div id="body" style="padding-left: 5%;padding-right: 5%;padding-top:2%;padding-bottom:2%;">
+        {{ paper.body|safe }}
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script type="text/javascript">
+        String.prototype.regexIndexOf = function(regex, startpos) {
+            var indexOf = this.substring(startpos || 0).search(regex);
+            return (indexOf >= 0) ? (indexOf + (startpos || 0)) : indexOf;
+        }
+
+        var text = $('#body').text();
+        for(var i=0; i<text.length;i++) {
+            if (text[i] === "@"){
+                var textSection = text.substring(i, text.length);
+                var checkString = textSection.substring(0, textSection.regexIndexOf('[\\n, ]'));
+                var total = 0;
+                for (var p = 0; p<checkString.length; p++) {
+                    if (checkString[p] === '-'){
+                        total += 1
+                    }
+                }
+                if (total == 2) {
+                    console.log(checkString);
+                    var html = $('#body').html();
+                    var start = html.search(checkString);
+                    var end = start + checkString.length;
+                    $('#body').html(html.substring(0, start) + '<a href="/paper/' + checkString.substring(1, checkString.length) + '/">' + checkString + '</a>' + html.substring(end, html.length));
+                }
+            }
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block extra_head %}
+    <style>
+        .center-div
+        {
+             margin: 0 auto;
+             width: 200px;
+        }
+    </style>
+{% endblock %}
+{% block top_bar %}
+    <a href="{% url 'home' %}"><i class="material-icons">home</i></a>
+{% endblock %}
+{% block content %}
+    <div style="text-align: center;">
+        <h1>Login to The Paper</h1>
+    </div>
+    <form method="POST" id="login-form" class="center-div">
+        <div style="color:red;">
+            <span>{{ error }}</span>
+        </div>
+        {% csrf_token %}
+        <label for="username">
+            Username
+        </label>
+        <input name="username" type="text" style="width:100%;"/>
+        <br />
+        <label for="password">
+            Password
+        </label>
+        <input name="password" type="password" style="width:100%;" />
+        <br />
+        <button>Submit</button>
+        <br />
+        <a href="{% url "register-user" %}">Don't have an account? Register here.</a>
+    </form>
+{% endblock %}
